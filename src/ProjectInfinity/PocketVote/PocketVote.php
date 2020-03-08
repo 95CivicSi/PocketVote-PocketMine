@@ -91,7 +91,14 @@ class PocketVote extends PluginBase {
         $this->identity = $this->getConfig()->get('identity', null);
         $this->secret = $this->getConfig()->get('secret', null);
 
-        $this->onVote = $this->getConfig()->get('onvote', []);
+        $this->onVote = [];
+        foreach($this->getConfig()->get('onvote', []) as $index => $onVote){
+            if(!isset($onVote['cmd'])){
+                $this->getLogger()->error("Entry number $index contains an invalid configuration.  Missing entry \"cmd\".");
+                continue;
+            }
+            $this->onVote[] = $onVote;
+        }
         $this->lock = $this->getConfig()->get('lock', false);
         $this->expiration = 86400 * $this->getConfig()->get('vote-expiration', 7);
         $this->voteManager = new VoteManager($this);
